@@ -1,0 +1,25 @@
+Locals which defined in main.tf of root can’t be used directly to any other modules
+
+
+To use it from root to other modules —> send it as an input and accept it as a variable only, directly locals are not sharable ad these are specific module scoped  
+
+Variables which defined in main.tf of root can’t be used directly to any other modules even if we define empty variable in variable.tf of that module  to use it from root main.tf —> send it as an input to module and then initialise the var in the variable.tf of that module and then use it.    Sharing b/w modules from vac to ec2  Write the variable / local as output in the module A and take that in the root file   Then use it as a variable in  module B , even if you are using local , need to use it as variable in module b .  You need to add the variable in that module b specified variable file and then only you can use.  example:  module "vpc_module" {
+  
+source = "/Users/saigampa/Desktop/scripts/python-codes/terraform-practice/test-locals-vars/vpc_module"
+
+}
+
+module "ec2" {
+  
+  source = "/Users/saigampa/Desktop/scripts/python-codes/terraform-practice/test-locals-vars/ ec2_module"
+  cidr_test = module.vpc_module.vpc_cidr_value
+}
+   in vpc_module:  output "vpc_cidr_value" {
+  
+  value = aws_vpc.test-vpc.cidr_block
+}
+  or   output "vpc_cidr_value" {
+  
+  value = var.vpc_cidr
+}
+  same for locals , but need to accept at other module as variable. 
