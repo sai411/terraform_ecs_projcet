@@ -29,3 +29,40 @@ module "ec2" {
   value = var.vpc_cidr
 }
   same for locals , but need to accept at other module as variable. 
+
+
+### :white_check_mark: **Correct Parts**:
+* :heavy_check_mark: **Locals are module-scoped** and **used to evaluate expressions**.
+* :heavy_check_mark: You **cannot modify locals at runtime** (they are immutable).
+* :heavy_check_mark: Locals can be **exposed via outputs** and **passed between modules** using variables.
+* :heavy_check_mark: **Variables can be passed across modules** via root module wiring.
+* :heavy_check_mark: Variables can be **set via `.tfvars`, CLI, environment variables**, etc.
+* :heavy_check_mark: Variables are **value mappings**, not functional expressions.
+---
+### :x: **Incorrect or Confusing Parts**:
+1. **"Variables are global scoped"** → :x:
+   * Terraform **variables are not globally scoped**.
+   * They are **module-scoped** just like locals. You **explicitly pass** them down via input/output.
+2. **"Variables cannot have functions"** → :x:
+   * Variables **can use functions** in their `default` values, like:
+     ```hcl
+     variable "region" {
+       default = upper("us-east-1")
+     }
+     ```
+   * But you **can’t dynamically change a variable’s value** during runtime. The assigned value stays fixed for a run.
+---
+### :white_check_mark: Corrected Summary:
+* **Locals**:
+  * Scoped to the module.
+  * Used for internal computation.
+  * Immutable.
+  * Can be passed indirectly by exposing as output and consuming via variable in another module.
+* **Variables**:
+  * Also **module-scoped** (not global).
+  * Used for configuration input.
+  * Can be passed between modules using input/output wiring in root module.
+  * Can accept values from CLI, `.tfvars`, env vars, etc.
+  * Can use functions in `default`, but the final value is static during runtime.
+---
+So, your understanding is **very close**, but tweak the points about **scope** and **function usage in variables**.
